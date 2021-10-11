@@ -1,6 +1,6 @@
-package entity
+package data
 
-data class AppState(
+data class AppDrawerState(
     val inboxProject: AppProject,
     val projects: List<AppProject>,
     val labels: List<AppLabel>,

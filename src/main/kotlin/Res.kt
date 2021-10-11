@@ -16,13 +16,13 @@ class ResBitmaps {
     val coreLauncher = "core__launcher.png"
     val coreNavigationMenu = "core__navigation_menu.png"
     val coreNavigationBack = "core__navigation_back.png"
+    val coreToggleOpened = "drawer__toggle_opened.png"
+    val coreToggleClosed = "drawer__toggle_closed.png"
 
     val drawerProjectInbox = "drawer__project_inbox.png"
     val drawerProjectRegular = "drawer__project_regular.png"
     val drawerProjectShared = "drawer__project_shared.png"
     val drawerLabel = "drawer__label.png"
-    val drawerToggleOpened = "drawer__toggle_opened.png"
-    val drawerToggleClosed = "drawer__toggle_closed.png"
 }
 
 class ResSizes {
@@ -38,6 +38,13 @@ class ResSizes {
     val drawerIconSpacing = 8
     val drawerSectionPaddingTop = 24 - drawerItemPaddingVertical
     val drawerSectionPaddingBottom = 8 - drawerItemPaddingVertical
+
+    val tasksPaddingVertical = 8
+    val tasksItemMinHeight = 48
+    val tasksItemPaddingHorizontal = 12
+    val tasksItemPaddingVertical = 4
+    val tasksToggleSpacing = 48
+    val tasksCheckSpacing = 8
 }
 
 class ResColors {

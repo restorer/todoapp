@@ -1,3 +1,6 @@
+package ui
+
+import Res
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -17,9 +20,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import entity.AppLabel
-import entity.AppProject
-import entity.AppState
+import data.AppDrawerState
+import data.AppLabel
+import data.AppProject
+import util.BitmapResourcePainter
+import util.LazyColumnWithScrollbar
 
 internal val COLOR_MAP = mapOf(
     30 to 0xffb8256f,
@@ -111,82 +116,74 @@ fun AppDrawerItemLabel(label: AppLabel, onClick: () -> Unit) {
 @Composable
 @Preview
 fun AppDrawer(
-    appState: AppState,
-    onAppStateChanged: (AppState) -> Unit,
+    drawerState: AppDrawerState,
+    onDrawerStateChanged: (AppDrawerState) -> Unit,
     onProjectClicked: (AppProject) -> Unit,
     onLabelClicked: (AppLabel) -> Unit,
 ) {
+    val favoriteProjects = drawerState.projects.filter { it.isFavorite }
+    val favoriteLabels = drawerState.labels.filter { it.isFavorite }
+
     LazyColumnWithScrollbar(
         contentPadding = PaddingValues(vertical = Res.sizes.drawerPaddingVertical.dp)
     ) {
-        item(key = "P:${appState.inboxProject.id}") {
-            AppDrawerItemProject(appState.inboxProject) {
-                onProjectClicked(appState.inboxProject)
+        item(key = "P:${drawerState.inboxProject.id}") {
+            AppDrawerItemProject(drawerState.inboxProject) {
+                onProjectClicked(drawerState.inboxProject)
             }
         }
-
-        val favoriteProjects = appState.projects.filter { it.isFavorite }
-        val favoriteLabels = appState.labels.filter { it.isFavorite }
 
         if (favoriteProjects.isNotEmpty() || favoriteLabels.isNotEmpty()) {
             item(key = "S:F") {
                 AppDrawerItem(
-                    if (appState.isFavoritesOpened) Res.bitmaps.drawerToggleOpened else Res.bitmaps.drawerToggleClosed,
+                    if (drawerState.isFavoritesOpened) Res.bitmaps.coreToggleOpened else Res.bitmaps.coreToggleClosed,
                     Res.strings.drawerFavorites,
                     isSection = true
                 ) {
-                    onAppStateChanged(appState.copy(isFavoritesOpened = !appState.isFavoritesOpened))
+                    onDrawerStateChanged(drawerState.copy(isFavoritesOpened = !drawerState.isFavoritesOpened))
                 }
             }
 
-            if (appState.isFavoritesOpened) {
+            if (drawerState.isFavoritesOpened) {
                 items(favoriteProjects, key = { "FP:${it.id}" }) {
-                    AppDrawerItemProject(it) {
-                        onProjectClicked(it)
-                    }
+                    AppDrawerItemProject(it) { onProjectClicked(it) }
                 }
 
                 items(favoriteLabels, key = { "FL:${it.id}" }) {
-                    AppDrawerItemLabel(it) {
-                        onLabelClicked(it)
-                    }
+                    AppDrawerItemLabel(it) { onLabelClicked(it) }
                 }
             }
         }
 
         item(key = "S:P") {
             AppDrawerItem(
-                if (appState.isProjectsOpened) Res.bitmaps.drawerToggleOpened else Res.bitmaps.drawerToggleClosed,
+                if (drawerState.isProjectsOpened) Res.bitmaps.coreToggleOpened else Res.bitmaps.coreToggleClosed,
                 Res.strings.drawerProjects,
                 isSection = true
             ) {
-                onAppStateChanged(appState.copy(isProjectsOpened = !appState.isProjectsOpened))
+                onDrawerStateChanged(drawerState.copy(isProjectsOpened = !drawerState.isProjectsOpened))
             }
         }
 
-        if (appState.isProjectsOpened) {
-            items(appState.projects, key = { "P:${it.id}" }) {
-                AppDrawerItemProject(it) {
-                    onProjectClicked(it)
-                }
+        if (drawerState.isProjectsOpened) {
+            items(drawerState.projects, key = { "P:${it.id}" }) {
+                AppDrawerItemProject(it) { onProjectClicked(it) }
             }
         }
 
         item(key = "S:L") {
             AppDrawerItem(
-                if (appState.isLabelsOpened) Res.bitmaps.drawerToggleOpened else Res.bitmaps.drawerToggleClosed,
+                if (drawerState.isLabelsOpened) Res.bitmaps.coreToggleOpened else Res.bitmaps.coreToggleClosed,
                 Res.strings.drawerLabels,
                 isSection = true
             ) {
-                onAppStateChanged(appState.copy(isLabelsOpened = !appState.isLabelsOpened))
+                onDrawerStateChanged(drawerState.copy(isLabelsOpened = !drawerState.isLabelsOpened))
             }
         }
 
-        if (appState.isLabelsOpened) {
-            items(appState.labels, key = { "L:${it.id}" }) {
-                AppDrawerItemLabel(it) {
-                    onLabelClicked(it)
-                }
+        if (drawerState.isLabelsOpened) {
+            items(drawerState.labels, key = { "L:${it.id}" }) {
+                AppDrawerItemLabel(it) { onLabelClicked(it) }
             }
         }
     }

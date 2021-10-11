@@ -1,4 +1,4 @@
-package entity
+package data
 
 data class AppProject(
     val id: Long,

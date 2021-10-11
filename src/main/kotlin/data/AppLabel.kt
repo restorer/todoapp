@@ -1,4 +1,4 @@
-package entity
+package data
 
 data class AppLabel(
     val id: Long,

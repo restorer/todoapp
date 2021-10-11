@@ -1,3 +1,6 @@
+package ui
+
+import Res
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,11 +23,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import entity.AppLabel
-import entity.AppProject
-import entity.AppState
+import data.AppDrawerState
+import data.AppLabel
+import data.AppProject
+import data.AppState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import util.BitmapResourcePainter
+import util.mapChanged
 
 @OptIn(ExperimentalMaterialApi::class)
 @Suppress("FunctionName")
@@ -34,27 +40,35 @@ fun App(
     appState: AppState,
     onAppStateChanged: (AppState) -> Unit,
 ) {
+    fun onDrawerStateChanged(drawerState: AppDrawerState) {
+        onAppStateChanged(appState.copy(drawer = drawerState))
+    }
+
     fun onProjectClicked(project: AppProject) {
         onAppStateChanged(appState.copy(
-            projects = mapChanged(appState.projects) {
-                if (!it.isInbox && it.id == project.id) {
-                    it.copy(isFavorite = !it.isFavorite)
-                } else {
-                    null
+            drawer = appState.drawer.copy(
+                projects = mapChanged(appState.drawer.projects) {
+                    if (!it.isInbox && it.id == project.id) {
+                        it.copy(isFavorite = !it.isFavorite)
+                    } else {
+                        null
+                    }
                 }
-            }
+            )
         ))
     }
 
     fun onLabelClicked(label: AppLabel) {
         onAppStateChanged(appState.copy(
-            labels = mapChanged(appState.labels) {
-                if (it.id == label.id) {
-                    it.copy(isFavorite = !it.isFavorite)
-                } else {
-                    null
+            drawer = appState.drawer.copy(
+                labels = mapChanged(appState.drawer.labels) {
+                    if (it.id == label.id) {
+                        it.copy(isFavorite = !it.isFavorite)
+                    } else {
+                        null
+                    }
                 }
-            }
+            )
         ))
     }
 
@@ -108,19 +122,19 @@ fun App(
                             Modifier.width(Res.sizes.drawerWidth.dp)
                                 .background(Color(Res.colors.drawerBackground))
                         ) {
-                            AppDrawer(appState, onAppStateChanged, ::onProjectClicked, ::onLabelClicked)
+                            AppDrawer(appState.drawer, ::onDrawerStateChanged, ::onProjectClicked, ::onLabelClicked)
                         }
 
-                        AppContent()
+                        AppContent(appState, onAppStateChanged)
                     }
                 } else {
                     ModalDrawer(
                         drawerContent = {
-                            AppDrawer(appState, onAppStateChanged, ::onProjectClicked, ::onLabelClicked)
+                            AppDrawer(appState.drawer, ::onDrawerStateChanged, ::onProjectClicked, ::onLabelClicked)
                         },
                         drawerState = drawerState
                     ) {
-                        AppContent()
+                        AppContent(appState, onAppStateChanged)
                     }
                 }
             }
