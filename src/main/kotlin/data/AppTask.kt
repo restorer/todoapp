@@ -8,4 +8,5 @@ data class AppTask(
     val labels: List<AppLabel> = emptyList(),
     val priority: Int = 1,
     val children: List<AppTask> = emptyList(),
+    val isChildrenOpened: Boolean = true,
 )

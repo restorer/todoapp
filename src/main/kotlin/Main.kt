@@ -5,10 +5,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import data.AppContentState
 import data.AppDrawerState
 import data.AppLabel
 import data.AppProject
 import data.AppState
+import data.AppTask
+import ui.App
 import util.BitmapResourcePainter
 
 // https://developer.todoist.com/guides/#get-in-touch
@@ -188,6 +191,29 @@ fun main() {
                                 name = "logic",
                                 colorIndex = 7,
                             )
+                        )
+                    ),
+                    content = AppContentState(
+                        tasks = listOf(
+                            AppTask(
+                                content = "На потом",
+                                children = listOf(
+                                    AppTask(content = "Найти \"Транссибирские следопыты\" на трекере, желательно с невшитыми сабами"),
+                                    AppTask(content = "Data-Oriented programming by Yehonathan Sharvit"),
+                                    AppTask(
+                                        content = "Подарки жене",
+                                        children = listOf(
+                                            AppTask(content = "Серьги, с замочком, чтоб и спать и гулять и небольшие и в баню, и чтоб не потерялись. Чтоб с маской было удобно носить"),
+                                            AppTask(content = "Цветы")
+                                        )
+                                    ),
+                                    AppTask(
+                                        content = "Техпора",
+                                        description = "Онлайн-дискуссии с лидерами IT-индустрии",
+                                    )
+                                )
+                            ),
+                            AppTask(content = "Мне - попробовать взять обновлённые сертификаты о прививке в 7й поликлинике"),
                         )
                     )
                 )

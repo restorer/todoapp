@@ -10,14 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Checkbox
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import data.AppState
+import data.AppContentState
+import data.AppTask
 import util.BitmapResourcePainter
 import util.LazyColumnWithScrollbar
 
@@ -27,10 +30,12 @@ enum class AppContentToggleState {
     Closed
 }
 
+data class AppContentTask(val task: AppTask, val depth: Int, val toggleState: AppContentToggleState)
+
 @Suppress("FunctionName")
 @Composable
 @Preview
-fun AppContentItem(childrenState: AppContentToggleState) {
+fun AppContentItem(contentTask: AppContentTask) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -41,13 +46,13 @@ fun AppContentItem(childrenState: AppContentToggleState) {
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (childrenState == AppContentToggleState.None) {
+        if (contentTask.toggleState == AppContentToggleState.None) {
             Spacer(Modifier.size(Res.sizes.tasksToggleSpacing.dp))
         } else {
             IconButton(onClick = {}) {
                 Image(
                     painter = BitmapResourcePainter(
-                        if (childrenState == AppContentToggleState.Opened) {
+                        if (contentTask.toggleState == AppContentToggleState.Opened) {
                             Res.bitmaps.coreToggleOpened
                         } else {
                             Res.bitmaps.coreToggleClosed
@@ -59,34 +64,44 @@ fun AppContentItem(childrenState: AppContentToggleState) {
         }
 
         Checkbox(
-            checked = false,
+            checked = contentTask.task.isCompleted,
             onCheckedChange = {}
         )
+
         Spacer(Modifier.size(Res.sizes.tasksCheckSpacing.dp))
-        Text("Мне - попробовать взять обновлённые сертификаты о прививке в 7й поликлинике")
+        Text(contentTask.task.content, fontWeight = FontWeight.SemiBold)
+
+        if (contentTask.task.description.isNotEmpty()) {
+            Text(contentTask.task.description)
+        }
     }
+}
+
+internal fun flattenTasks(tasks: List<AppTask>, depth: Int = 0): List<AppContentTask> {
+    val result = mutableListOf<AppContentTask>()
+
+    for (task in tasks) {
+        result.add(AppContentTask(task, depth, AppContentToggleState.None))
+        result.addAll(flattenTasks(task.children, depth + 1))
+    }
+
+    return result
 }
 
 @Suppress("FunctionName")
 @Composable
 @Preview
 fun AppContent(
-    appState: AppState,
-    onAppStateChanged: (AppState) -> Unit,
+    contentState: AppContentState,
+    onContentStateChanged: (AppContentState) -> Unit,
 ) {
+    val contentTasks = flattenTasks(contentState.tasks)
+
     LazyColumnWithScrollbar(
         contentPadding = PaddingValues(vertical = Res.sizes.tasksPaddingVertical.dp)
     ) {
-        item {
-            AppContentItem(AppContentToggleState.None)
-        }
-
-        item {
-            AppContentItem(AppContentToggleState.Opened)
-        }
-
-        item {
-            AppContentItem(AppContentToggleState.Closed)
+        items(contentTasks) {
+            AppContentItem(it)
         }
     }
 }

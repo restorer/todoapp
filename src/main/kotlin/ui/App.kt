@@ -23,6 +23,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import data.AppContentState
 import data.AppDrawerState
 import data.AppLabel
 import data.AppProject
@@ -42,6 +43,10 @@ fun App(
 ) {
     fun onDrawerStateChanged(drawerState: AppDrawerState) {
         onAppStateChanged(appState.copy(drawer = drawerState))
+    }
+
+    fun onContentStateChanged(contentState: AppContentState) {
+        onAppStateChanged(appState.copy(content = contentState))
     }
 
     fun onProjectClicked(project: AppProject) {
@@ -125,7 +130,7 @@ fun App(
                             AppDrawer(appState.drawer, ::onDrawerStateChanged, ::onProjectClicked, ::onLabelClicked)
                         }
 
-                        AppContent(appState, onAppStateChanged)
+                        AppContent(appState.content, ::onContentStateChanged)
                     }
                 } else {
                     ModalDrawer(
@@ -134,7 +139,7 @@ fun App(
                         },
                         drawerState = drawerState
                     ) {
-                        AppContent(appState, onAppStateChanged)
+                        AppContent(appState.content, ::onContentStateChanged)
                     }
                 }
             }
